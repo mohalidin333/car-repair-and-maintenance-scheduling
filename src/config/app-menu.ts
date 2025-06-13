@@ -1,9 +1,10 @@
 import {
-  DatabaseBackup,
-  FileChartColumn,
-  FileSearch,
-  Inbox,
+  CalendarCheck2,
+  CalendarClock,
+  CreditCard,
+  Handshake,
   LayoutDashboard,
+  Package2,
   Users2,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
@@ -21,9 +22,24 @@ export const AdminMenu: MenuType[] = [
     icon: LayoutDashboard,
   },
   {
-    title: "Inbox",
-    url: "/inbox",
-    icon: Inbox,
+    title: "Appointments",
+    url: "/appointments",
+    icon: CalendarCheck2,
+  },
+  {
+    title: "Inventory",
+    url: "/inventory",
+    icon: Package2,
+  },
+  {
+    title: "Services",
+    url: "/services",
+    icon: Handshake,
+  },
+  {
+    title: "Schedules",
+    url: "/schedules",
+    icon: CalendarClock,
   },
   {
     title: "User Management",
@@ -31,18 +47,8 @@ export const AdminMenu: MenuType[] = [
     icon: Users2,
   },
   {
-    title: "Reports",
-    url: "/reports",
-    icon: FileChartColumn,
-  },
-  {
-    title: "Backup & Restore",
-    url: "/backup-restore",
-    icon: DatabaseBackup,
-  },
-  {
-    title: "Audit Logs",
-    url: "/audit-logs",
-    icon: FileSearch,
+    title: "Payment Settings",
+    url: "/payment-settings",
+    icon: CreditCard,
   },
 ];

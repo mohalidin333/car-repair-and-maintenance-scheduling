@@ -20,7 +20,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <div className=" p-[.9rem] border-b">
-          <span className="font-bold text-lg">QSoftX</span>
+          <span className="font-bold text-lg">CSU-CRMS</span>
         </div>
         <SidebarGroup>
           <SidebarGroupLabel>Pages</SidebarGroupLabel>
