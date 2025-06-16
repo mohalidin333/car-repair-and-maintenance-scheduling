@@ -4,7 +4,7 @@ export default function AboutSection() {
   return (
     <section id="about" className="border-y bg-gray-50 py-[5rem] px-8">
       <div className="md:flex-row flex-col flex justify-between gap-[5rem] max-w-5xl mx-auto">
-        <div className="md:pb-0 pb-[5rem] border-b md:border-b-0 md:border-r pr-[5rem] w-full flex flex-col gap-4 items-start">
+        <div className="md:pb-0 pb-[5rem] border-b md:border-b-0 md:border-r md:pr-[5rem] w-full flex flex-col gap-4 items-start">
           <p className="bg-white px-2 py-1 rounded-full border text-gray-500 text-sm font-semibold">
             About Us
           </p>

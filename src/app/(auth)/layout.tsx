@@ -16,7 +16,7 @@ export default function AuthLayout({
 
         <div className="flex justify-center">
           <Image
-            src={"/svg/schedule.svg"}
+            src={"/svg/car.svg"}
             alt={"Proud Coder"}
             width={500}
             height={500}
