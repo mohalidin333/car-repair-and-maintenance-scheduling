@@ -1,50 +1,47 @@
-import { Brush, MonitorCog, Plane } from "lucide-react";
+import { Wrench } from "lucide-react";
+import { PiScrewdriverBold } from "react-icons/pi";
 import React from "react";
 
 export default function ServicesSection() {
-  return (
-    <section className="px-8 bg-white py-[5rem] flex flex-col gap-8">
-      <div className="flex flex-col gap-4 max-w-2xl mx-auto text-center">
-        <h1 className="title">
-          We offer a wide range of services to help you achieve your goals
-        </h1>
+  const services = [
+    {
+      icon: <Wrench size={30} />,
+      title: "Repair Services",
+      description:
+        "From engine issues to brake problems, we provide professional car repair solutions for every need.",
+    },
+    {
+      icon: <PiScrewdriverBold size={30} />,
+      title: "Preventive Maintenance",
+      description:
+        "Keep your car in top shape with scheduled checkups, fluid top-ups, and inspections.",
+    },
+  ];
 
+  return (
+    <section id="services" className="border-y px-8 bg-gray-50 py-[5rem] flex flex-col gap-[5rem]">
+      <div className="flex flex-col gap-4 max-w-2xl mx-auto text-center items-center">
+        <p className="bg-white px-2 py-1 rounded-full border text-gray-500 text-sm font-semibold">
+          Services
+        </p>
+        <h1 className="title">Reliable Repair & Maintenance Services</h1>
         <p className="sub-title">
-          From designing intuitive user interfaces to deploying full-scale web
-          applications, our team ensures each solution is tailored to your
-          specific needs.
+          We offer essential car care services to keep your vehicle running
+          smoothly and safely — from expert repairs to routine maintenance.
         </p>
       </div>
 
-      <div className=" bg-white p-10 rounded-md">
-        <div className="md:flex-row flex-col max-w-5xl mx-auto flex gap-[5rem] text-center">
-          <div className="items-center flex flex-col gap-4 flex-1">
-            <Brush size={30} />
-            <span className="title font-bold">UI/UX Design</span>
-            <p className="sub-title">
-              Crafting intuitive and visually appealing designs that enhance
-              user experience.
-            </p>
+      <div className="md:flex-nowrap flex-wrap flex w-full max-w-5xl mx-auto gap-6">
+        {services.map((service, index) => (
+          <div
+            key={index}
+            className="w-full flex flex-col items-center text-center p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition duration-300 ease-in-out bg-white"
+          >
+            <div className="text-[#f0b100] mb-3">{service.icon}</div>
+            <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
+            <p className="text-sm text-gray-600">{service.description}</p>
           </div>
-
-          <div className="items-center flex flex-col gap-4 flex-1">
-            <MonitorCog size={30} />
-            <span className="title font-bold">Web Development</span>
-            <p className="sub-title">
-              Building responsive and high-performance websites with modern
-              technologies.
-            </p>
-          </div>
-
-          <div className="items-center flex flex-col gap-4 flex-1">
-          <Plane size={30} />
-            <span className="title font-bold">Deployment</span>
-            <p className="sub-title">
-              Ensuring your application is securely hosted, optimized, and ready
-              for users.
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   );

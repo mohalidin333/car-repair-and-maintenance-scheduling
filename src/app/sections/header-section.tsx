@@ -7,9 +7,9 @@ import { AlignLeft } from "lucide-react";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/services", label: "Services" },
-  { href: "/contact", label: "Contact" },
+  { href: "#about", label: "About" },
+  { href: "#feedback", label: "Feedback" },
+  { href: "#services", label: "Services" },
 ];
 
 export default function HeaderSection() {
@@ -26,7 +26,7 @@ export default function HeaderSection() {
             <AlignLeft size={17} />
           </button>
 
-          <span className="font-bold md:text-xl">CSU-CRMS</span>
+          <span className="font-bold md:text-xl">CRMS</span>
         </div>
         {/* links */}
         <nav>
@@ -35,7 +35,7 @@ export default function HeaderSection() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-gray-700 hover:text-blue-500"
+                  className="text-gray-700 hover:text-[#f0b100]"
                 >
                   {link.label}
                 </Link>
@@ -43,9 +43,14 @@ export default function HeaderSection() {
             ))}
           </ul>
         </nav>
-        <Button>
-          <Link href="/login">Login</Link>
-        </Button>
+        <div className="space-x-2">
+          <Button variant={"outline"}>
+            <Link href="/login">Login</Link>
+          </Button>
+          <Button>
+            <Link href="/schedule">Schedule</Link>
+          </Button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -79,9 +84,14 @@ export default function HeaderSection() {
             ))}
           </ul>
 
-          <Button>
-            <Link href="/login">Login</Link>
-          </Button>
+          <div className="space-x-2">
+            <Button variant={"outline"}>
+              <Link href="/login">Login</Link>
+            </Button>
+            <Button>
+              <Link href="/schedule">Schedule</Link>
+            </Button>
+          </div>
         </nav>
       </div>
     </header>

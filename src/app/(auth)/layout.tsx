@@ -9,21 +9,22 @@ export default function AuthLayout({
   return (
     <main className="flex h-screen">
       {children}
-      <div className="flex flex-col justify-between p-4 flex-1 bg-primary md:flex hidden">
-        <span className="text-white font-bold text-xl">QSoftX</span>
+      <div className="flex flex-col justify-between p-8 flex-1 bg-gray-100 md:flex hidden">
+        <span className="font-bold text-2xl">
+          Car Repair and Maintenance Scheduling
+        </span>
 
         <div className="flex justify-center">
           <Image
-            src={"/svg/auth.svg"}
+            src={"/svg/schedule.svg"}
             alt={"Proud Coder"}
             width={500}
             height={500}
           />
         </div>
 
-        <p className="text-xl text-white">
-          Maximize QSoftX Template App to Focus Building Your App&apos;s Core
-          Features
+        <p className="text-xl leading-10 text-gray-700">
+          Welcome to our car repair and maintenance scheduling system.
         </p>
       </div>
     </main>

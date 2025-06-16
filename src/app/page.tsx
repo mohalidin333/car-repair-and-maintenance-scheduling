@@ -4,6 +4,8 @@ import HeaderSection from './sections/header-section';
 import AboutSection from './sections/about-section';
 import ServicesSection from './sections/services-section';
 import FooterSection from './sections/footer-section';
+import FeedbacksSection from './sections/feedbacks-section';
+import ScheduleSection from './sections/schedule-section';
 
 export default function Home() {
   return (
@@ -11,7 +13,9 @@ export default function Home() {
       <HeaderSection/>
       <HeroSection/>
       <AboutSection/>
+      <FeedbacksSection/>
       <ServicesSection/>
+      <ScheduleSection />
       <FooterSection/>
     </main>
   )
