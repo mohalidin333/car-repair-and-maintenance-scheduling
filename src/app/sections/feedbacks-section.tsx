@@ -32,7 +32,7 @@ export default function FeedbacksSection() {
         <p className="bg-white px-2 py-1 rounded-full border text-gray-500 text-sm font-semibold">
           Feedback
         </p>
-        <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
+        <h2 className="text-3xl font-bold mb-4">What Our Customers Say</h2>
         <p className="text-gray-600 text-base">
           Real stories from real car owners who trust us to keep their vehicles
           running smoothly.
@@ -50,7 +50,9 @@ export default function FeedbacksSection() {
                 <Star key={i} size={16} fill="currentColor" />
               ))}
             </div>
-            <p className="text-gray-700 text-sm italic">&quot;{fb.comment}&quot;</p>
+            <p className="text-gray-700 text-sm italic">
+              &quot;{fb.comment}&quot;
+            </p>
             <span className="text-sm font-semibold text-gray-800 mt-auto">
               — {fb.name}
             </span>

@@ -5,7 +5,7 @@ import React from "react";
 export default function HeroSection() {
   return (
     <section id="hero" className="bg-white px-8 pt-[7rem] pb-[5rem]">
-      <div className="max-w-5xl mx-auto grid gap-4 grid-cols-1 md:grid-cols-2">
+      <div className=" max-w-5xl mx-auto grid gap-4 grid-cols-1 md:grid-cols-2">
         <div className="max-w-xl flex flex-col gap-4 items-start">
           <h1 className="title">
             Reliable Car Care, Just a Click Away
@@ -23,6 +23,7 @@ export default function HeroSection() {
           alt={"Proud Coder"}
           width={500}
           height={500}
+          className="md:mt-0 mt-8"
         />
       </div>
     </section>
