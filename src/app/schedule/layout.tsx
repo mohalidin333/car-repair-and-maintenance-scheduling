@@ -4,9 +4,9 @@ export default function ScheduleLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-y-auto p-4 justify-center mx-auto md:flex-row flex-col flex gap-4 items-center h-screen">
+    <div className="overflow-y-auto p-4 justify-center mx-auto md:flex-row flex-col flex gap-4 items-center">
       <div className="flex-col max-w-[600px] flex items-start justify-center gap-4 w-full">
-       <div className="space-y-4 w-full">
+       <div className="space-y-4 w-full overflow-y-auto">
         <h1>Select Date</h1>
          {children}
        </div>
