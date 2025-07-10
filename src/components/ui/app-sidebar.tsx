@@ -20,7 +20,9 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <div className=" p-[.9rem] border-b">
-          <span className="font-bold text-lg">CSU-CRMS</span>
+          <span className="font-bold text-lg flex items-center gap-2">
+            Rodtrak Autoserv, Inc.
+          </span>
         </div>
         <SidebarGroup>
           <SidebarGroupLabel>Pages</SidebarGroupLabel>

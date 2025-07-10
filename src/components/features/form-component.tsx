@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "../ui/textarea";
 
 type FormFields<T extends FieldValues> = {
   label: string;
@@ -75,8 +76,10 @@ export default function FormComponent<T extends FieldValues>({
                               ))}
                             </SelectContent>
                           </Select>
+                        ) : subItem.type === "textarea" ? (
+                          <Textarea {...field} />
                         ) : (
-                          <Input type={subItem.type} {...field} />
+                          <Input type={subItem.type} {...field} multiple />
                         )}
                       </FormControl>
                       <FormMessage />
@@ -112,8 +115,10 @@ export default function FormComponent<T extends FieldValues>({
                           ))}
                         </SelectContent>
                       </Select>
+                    ) : item.type === "textarea" ? (
+                      <Textarea {...field} />
                     ) : (
-                      <Input type={item.type} {...field} />
+                      <Input type={item.type} {...field} multiple />
                     )}
                   </FormControl>
                   <FormMessage />

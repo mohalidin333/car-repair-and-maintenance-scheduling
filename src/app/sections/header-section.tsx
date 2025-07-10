@@ -26,7 +26,7 @@ export default function HeaderSection() {
             <AlignLeft size={17} />
           </button>
 
-          <span className="font-bold md:text-xl">CRMS</span>
+          <span className="font-bold md:text-xl">Rodtrak Autoserv, Inc.</span>
         </div>
         {/* links */}
         <nav>

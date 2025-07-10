@@ -1,11 +1,10 @@
 import {
-  CalendarCheck2,
   CalendarClock,
   CreditCard,
   Handshake,
   LayoutDashboard,
   Package2,
-  Users2,
+  Users,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -18,37 +17,37 @@ export type MenuType = {
 export const AdminMenu: MenuType[] = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/admin/dashboard",
     icon: LayoutDashboard,
   },
   {
-    title: "Appointments",
-    url: "/appointments",
-    icon: CalendarCheck2,
+    title: "Customers",
+    url: "/admin/customers",
+    icon: Users,
   },
   {
     title: "Inventory",
-    url: "/inventory",
+    url: "/admin/inventory",
     icon: Package2,
   },
   {
     title: "Services",
-    url: "/services",
+    url: "/admin/services",
     icon: Handshake,
   },
   {
-    title: "Schedules",
-    url: "/schedules",
+    title: "User Management",
+    url: "/admin/user-management",
+    icon: Users,
+  },
+  {
+    title: "Scheduling Settings",
+    url: "/admin/scheduling-settings",
     icon: CalendarClock,
   },
   {
-    title: "User Management",
-    url: "/user-management",
-    icon: Users2,
-  },
-  {
     title: "Payment Settings",
-    url: "/payment-settings",
+    url: "/admin/payment-settings",
     icon: CreditCard,
   },
 ];

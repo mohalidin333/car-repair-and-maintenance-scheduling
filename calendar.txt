@@ -1,0 +1,294 @@
+"use client";
+import React, { useEffect, useState } from "react";
+
+type Month = { title: string; number: number };
+
+type Scheduled = {
+  year: number;
+  month: number;
+  days: { day: number; times: { time: string; status: string }[] }[];
+};
+
+// months
+const months: Month[] = [
+  { title: "January", number: 0 },
+  { title: "February", number: 1 },
+  { title: "March", number: 2 },
+  { title: "April", number: 3 },
+  { title: "May", number: 4 },
+  { title: "June", number: 5 },
+  { title: "July", number: 6 },
+  { title: "August", number: 7 },
+  { title: "September", number: 8 },
+  { title: "October", number: 9 },
+  { title: "November", number: 10 },
+  { title: "December", number: 11 },
+];
+
+// not available month / day / time
+const availability = {
+  holyDay: [
+    {
+      month: 1,
+      day: 1,
+    },
+  ],
+  restWeek: [1, 2],
+  availableTime: ["9:00 AM", "10:00 AM", "11:00 AM"],
+};
+
+const scheduled: Scheduled[] = [
+  {
+    year: 2025,
+    month: 0,
+    days: [
+      {
+        day: 1,
+        times: [
+          { time: "9:00 AM", status: "success" },
+          { time: "11:00 AM", status: "pending" },
+        ],
+      },
+      {
+        day: 4,
+        times: [
+          { time: "10:00 AM", status: "pending" },
+          { time: "11:00 AM", status: "success" },
+        ],
+      },
+    ],
+  },
+  {
+    year: 2025,
+    month: 3,
+    days: [
+      {
+        day: 15,
+        times: [
+          { time: "8:00 AM", status: "success" },
+          { time: "9:30 AM", status: "pending" },
+        ],
+      },
+      {
+        day: 18,
+        times: [
+          { time: "10:00 AM", status: "" },
+          { time: "11:30 AM", status: "success" },
+        ],
+      },
+    ],
+  },
+  {
+    year: 2025,
+    month: 5,
+    days: [
+      {
+        day: 10,
+        times: [
+          { time: "9:00 AM", status: "success" },
+          { time: "1:00 PM", status: "" },
+        ],
+      },
+      {
+        day: 12,
+        times: [
+          { time: "11:00 AM", status: "pending" },
+          { time: "3:00 PM", status: "success" },
+        ],
+      },
+    ],
+  },
+  {
+    year: 2025,
+    month: 7,
+    days: [
+      {
+        day: 5,
+        times: [
+          { time: "8:30 AM", status: "" },
+          { time: "10:30 AM", status: "pending" },
+        ],
+      },
+      {
+        day: 9,
+        times: [{ time: "2:00 PM", status: "success" }],
+      },
+    ],
+  },
+  {
+    year: 2025,
+    month: 9,
+    days: [
+      {
+        day: 21,
+        times: [
+          { time: "9:00 AM", status: "success" },
+          { time: "10:30 AM", status: "" },
+        ],
+      },
+    ],
+  },
+];
+
+const weeksName: string[] = ["Su", "M", "T", "W", "Th", "F", "Sa"];
+
+export default function SchedulePage() {
+  const date = new Date();
+  const currentMonth = date.getMonth() + 1;
+  const currentYear = date.getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState<number>(currentMonth);
+  const [totalDays, setTotalDays] = useState<
+    {
+      day: { week: number; number: number; holiday: boolean };
+      time: string[];
+    }[]
+  >([]);
+  const [selectedDate, setSelectedDate] = useState<number>(1);
+  const selectedDay = totalDays.find((day) => day.day.number === selectedDate);
+
+  // get all days in selected month with available time slots
+  function getDaysInMonth(month: number, year: number) {
+    setTotalDays([]);
+    const days = new Date(year, month, 0).getDate();
+    for (let i = 0; i < days; i++) {
+      const day = i + 1;
+
+      // get week
+      const week = new Date(year, month, i - 1).getDay();
+
+      const filteredDay = checkHoliday(selectedMonth, day)
+        ? { day: day, holiday: true }
+        : { day: day, holiday: false };
+
+      setTotalDays((prev) => [
+        ...prev,
+        {
+          day: { week, number: filteredDay.day, holiday: filteredDay.holiday },
+          time: availability.availableTime,
+        },
+      ]);
+    }
+  }
+
+  // check if date is no available slots
+  // function checkDateAvailableSlots(day: number): boolean {
+  //   return scheduled.some((slot) => {
+  //     if (slot.year === currentYear && slot.month === selectedMonth) {
+  //       return slot.days.some((d) => d.day === day && d.times.length > 0);
+  //     }
+  //   });
+  // }
+
+  // check if time is available
+  function checkTimeAvailable(time: string): string | undefined {
+    for (const slot of scheduled) {
+      console.log(slot.month, selectedMonth);
+      if (slot.year === currentYear && slot.month === selectedMonth) {
+        for (const d of slot.days) {
+          if (d.day === selectedDay?.day.number) {
+            for (const t of d.times) {
+              if (t.time === time) {
+                return t.status;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // check holiday
+  function checkHoliday(month: number, day: number): boolean | null {
+    const filtered = availability.holyDay.filter(
+      (d) => d.month === month && d.day === day
+    );
+    if (filtered.length > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  useEffect(() => {
+    getDaysInMonth(currentMonth, currentYear);
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* month selector */}
+      <div className="flex gap-4 flex-wrap">
+        {months.map((month, index) => (
+          <div
+            onClick={() => {
+              getDaysInMonth(month.number, currentYear);
+              setSelectedMonth(month.number);
+            }}
+            key={index}
+            className="text-sm d border border-gray-300 rounded-lg px-2 py-1 cursor-pointer hover:bg-gray-100 transition-colors"
+          >
+            {month.title}
+          </div>
+        ))}
+      </div>
+      {/* day selector */}
+      <div className="flex">
+        {weeksName.map((day, weekIndex) => (
+          <div key={weekIndex} className="items-center flex flex-col">
+            <p className="text-sm d border-b border-r w-10 h-10 grid place-items-center cursor-pointer hover:bg-gray-100 transition-colors">
+              {day}
+            </p>
+            {totalDays
+              .filter((day) => day.day.week === weekIndex)
+              .map((day, index) => (
+                <div
+                  onClick={() => setSelectedDate(day.day.number)}
+                  key={index}
+                  className={`${
+                    day.day.holiday && "border-red-500 bg-red-100"
+                  }    flex items-center justify-center h-10 w-10 border    transition-colors`}
+                >
+                  {day.day.number}
+                </div>
+              ))}
+          </div>
+        ))}
+      </div>
+      {/* time slots selector */}
+      <div className="space-y-4">
+        {/* status meaning */}
+        <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-gray-300 ml-1"></div>
+            <span className="text-sm">Available</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-yellow-300 ml-1"></div>
+            <span className="text-sm">Pending</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-green-300 ml-1"></div>
+            <span className="text-sm">Booked</span>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          {selectedDay &&
+            selectedDay.time.length > 0 &&
+            selectedDay.time.map((time, index) => (
+              <div
+                key={index}
+                className={`${
+                  checkTimeAvailable(time) === "success"
+                    ? "bg-green-100 border border-green-300 cursor-not-allowed"
+                    : checkTimeAvailable(time) === "pending"
+                    ? "bg-yellow-100 border border-yellow-300 cursor-not-allowed"
+                    : "border border-gray-300 cursor-pointer hover:bg-gray-100"
+                } rounded-lg px-2 py-1 text-sm transition-colors`}
+              >
+                {time}
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+}

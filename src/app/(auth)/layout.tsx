@@ -11,7 +11,7 @@ export default function AuthLayout({
       {children}
       <div className="flex flex-col justify-between p-8 flex-1 bg-gray-100 md:flex hidden">
         <span className="font-bold text-2xl">
-          Car Repair and Maintenance Scheduling
+          Rodtrak Autoserv, Inc.
         </span>
 
         <div className="flex justify-center">

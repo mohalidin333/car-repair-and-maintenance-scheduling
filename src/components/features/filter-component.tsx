@@ -10,8 +10,10 @@ import React from "react";
 import { Button } from "../ui/button";
 
 export default function FilterComponent({
+  title,
   children,
 }: {
+  title: string;
   children: React.ReactNode;
 }) {
   return (
@@ -19,7 +21,7 @@ export default function FilterComponent({
       <DropdownMenuTrigger asChild>
         <Button variant={"outline"}>
           <Filter size={15} />
-          Filter
+          {title}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

@@ -29,6 +29,7 @@ type PropsType<T> = {
   columns: ColumnDef<T>[];
   columnFilters: ColumnFiltersState;
   setColumnFilters: (filters: Updater<ColumnFiltersState>) => void;
+  className?: string;
 };
 
 export default function TableComponent<T>({
@@ -36,10 +37,11 @@ export default function TableComponent<T>({
   columns,
   columnFilters,
   setColumnFilters,
+  className,
 }: PropsType<T>) {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 15,
+    pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -61,8 +63,8 @@ export default function TableComponent<T>({
   });
 
   return (
-    <div className="flex flex-col gap-4 ">
-      <div className="border rounded-md overflow-x-auto">
+    <div className="flex flex-col gap-4">
+      <div className={`${className} border rounded-md overflow-x-auto`}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => {
@@ -128,32 +130,34 @@ export default function TableComponent<T>({
       </div>
 
       {/* pagination */}
-      <div className="flex gap-2 justify-end">
-        <Button
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          variant={"outline"}
-          size={"sm"}
-        >
-          <ArrowLeft size={15} />
-        </Button>
-        <div className="flex items-center">
-          <span className="bg-white border px-3 h-8 grid place-items-center text-sm rounded">
-            {table.getState().pagination.pageIndex + 1}
-          </span>
-          <span className="bg-white border px-3 h-8 grid place-items-center text-sm rounded">
-            {table.getPageCount()}
-          </span>
+      {table.getCoreRowModel().rows.length > 10 && (
+        <div className="flex gap-2 justify-end">
+          <Button
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            variant={"outline"}
+            size={"sm"}
+          >
+            <ArrowLeft size={15} />
+          </Button>
+          <div className="flex items-center">
+            <span className="bg-white border px-3 h-8 grid place-items-center text-sm rounded">
+              {table.getState().pagination.pageIndex + 1}
+            </span>
+            <span className="bg-white border px-3 h-8 grid place-items-center text-sm rounded">
+              {table.getPageCount()}
+            </span>
+          </div>
+          <Button
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            variant={"outline"}
+            size={"sm"}
+          >
+            <ArrowRight size={15} />
+          </Button>
         </div>
-        <Button
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          variant={"outline"}
-          size={"sm"}
-        >
-          <ArrowRight size={15} />
-        </Button>
-      </div>
+      )}
     </div>
   );
 }
