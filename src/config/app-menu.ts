@@ -1,6 +1,7 @@
 import {
   CalendarClock,
   CreditCard,
+  FileChartColumn,
   Handshake,
   LayoutDashboard,
   Package2,
@@ -34,6 +35,11 @@ export const AdminMenu: MenuType[] = [
     title: "Services",
     url: "/admin/services",
     icon: Handshake,
+  },
+  {
+    title: "Reports",
+    url: "/admin/reports",
+    icon: FileChartColumn,
   },
   {
     title: "User Management",

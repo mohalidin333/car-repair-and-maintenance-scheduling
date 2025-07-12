@@ -155,7 +155,7 @@ export default function AppointmentPage() {
     return () => {
       urls.forEach((url) => URL.revokeObjectURL(url.file));
     };
-  }, [imageFiles, images]);
+  }, [imageFiles]);
 
   return (
     <div className="space-y-8 px-4 py-8 max-w-screen-lg mx-auto">

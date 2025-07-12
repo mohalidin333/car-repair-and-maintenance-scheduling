@@ -1,17 +1,41 @@
 "use client";
 
 import React, { useState } from "react";
-import { Printer, MessageCircle, Car, User, Wrench, Package, Calendar, MapPin, Phone, CalendarDays, FileText, Plus, Edit2, Trash2 } from "lucide-react";
+import {
+  Printer,
+  MessageCircle,
+  Car,
+  User,
+  Wrench,
+  Package,
+  Calendar,
+  MapPin,
+  Phone,
+  CalendarDays,
+  FileText,
+  Plus,
+  Edit2,
+  Trash2,
+  ArrowLeft,
+} from "lucide-react";
 import Invoice from "../invoice";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
-export type Status = "Pending" | "Approved" | "Disapproved" | "Cancelled" | "Completed" | "In-Progress"
+export type Status =
+  | "Pending"
+  | "Approved"
+  | "Disapproved"
+  | "Cancelled"
+  | "Completed"
+  | "In-Progress";
 
 export type FollowUpNote = {
   id: string;
   date: string;
   note: string;
   createdAt: string;
-}
+};
 
 export type CustomerDetailsType = {
   invoice_id: string;
@@ -40,7 +64,7 @@ export type CustomerDetailsType = {
   status: Status;
   follow_up_date?: string;
   follow_up_notes: FollowUpNote[];
-}
+};
 
 const customerDetails = {
   invoice_id: "1234",
@@ -79,8 +103,8 @@ const customerDetails = {
       id: "1",
       date: "2024-05-10",
       note: "Customer called regarding AC still not working properly. Scheduled for re-inspection.",
-      createdAt: "2024-05-10T14:30:00Z"
-    }
+      createdAt: "2024-05-10T14:30:00Z",
+    },
   ],
   created_at: "2023-05-07T10:00:00Z",
 };
@@ -95,12 +119,12 @@ const statusOptions = [
 ];
 
 const statusColors = {
-  "Pending": "bg-yellow-100 text-yellow-800 border-yellow-200",
-  "Approved": "bg-green-100 text-green-800 border-green-200",
-  "Disapproved": "bg-red-100 text-red-800 border-red-200",
-  "Cancelled": "bg-gray-100 text-gray-800 border-gray-200",
+  Pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  Approved: "bg-green-100 text-green-800 border-green-200",
+  Disapproved: "bg-red-100 text-red-800 border-red-200",
+  Cancelled: "bg-gray-100 text-gray-800 border-gray-200",
   "In-Progress": "bg-blue-100 text-blue-800 border-blue-200",
-  "Completed": "bg-emerald-100 text-emerald-800 border-emerald-200",
+  Completed: "bg-emerald-100 text-emerald-800 border-emerald-200",
 };
 
 export default function WalkInPage() {
@@ -112,6 +136,7 @@ export default function WalkInPage() {
   const [newNote, setNewNote] = useState("");
   const [newNoteDate, setNewNoteDate] = useState("");
   const [editingNote, setEditingNote] = useState<FollowUpNote | null>(null);
+  const router = useRouter();
 
   const handlePrintInvoice = () => {
     setShowInvoice(true);
@@ -134,19 +159,19 @@ export default function WalkInPage() {
 
   const handleAddNote = () => {
     if (!newNote.trim() || !newNoteDate) return;
-    
+
     const note: FollowUpNote = {
       id: Date.now().toString(),
       date: newNoteDate,
       note: newNote.trim(),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
-    
+
     setDetails({
       ...details,
-      follow_up_notes: [...details.follow_up_notes, note]
+      follow_up_notes: [...details.follow_up_notes, note],
     });
-    
+
     setNewNote("");
     setNewNoteDate("");
     setShowAddNoteModal(false);
@@ -161,18 +186,18 @@ export default function WalkInPage() {
 
   const handleUpdateNote = () => {
     if (!editingNote || !newNote.trim() || !newNoteDate) return;
-    
-    const updatedNotes = details.follow_up_notes.map(note =>
+
+    const updatedNotes = details.follow_up_notes.map((note) =>
       note.id === editingNote.id
         ? { ...note, note: newNote.trim(), date: newNoteDate }
         : note
     );
-    
+
     setDetails({
       ...details,
-      follow_up_notes: updatedNotes
+      follow_up_notes: updatedNotes,
     });
-    
+
     setEditingNote(null);
     setNewNote("");
     setNewNoteDate("");
@@ -183,7 +208,9 @@ export default function WalkInPage() {
     if (confirm("Are you sure you want to delete this note?")) {
       setDetails({
         ...details,
-        follow_up_notes: details.follow_up_notes.filter(note => note.id !== noteId)
+        follow_up_notes: details.follow_up_notes.filter(
+          (note) => note.id !== noteId
+        ),
       });
     }
   };
@@ -191,27 +218,33 @@ export default function WalkInPage() {
   const formatFollowUpDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-8 px-4">
+      <div className="max-w-6xl mx-auto flex justify-end py-4">
+        <Button onClick={() => router.push("/customer")} variant={"outline"}>
+          <ArrowLeft size={15} />
+          Dashboard
+        </Button>
+      </div>
       <div className="max-w-6xl mx-auto">
         {/* Header Card */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
@@ -231,7 +264,11 @@ export default function WalkInPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium border ${statusColors[details.status]}`}>
+              <div
+                className={`px-3 py-1 rounded-full text-sm font-medium border ${
+                  statusColors[details.status]
+                }`}
+              >
                 {details.status}
               </div>
               <button
@@ -253,12 +290,16 @@ export default function WalkInPage() {
               <div className="bg-green-100 p-2 rounded-lg">
                 <User className="w-5 h-5 text-green-600" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Customer Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Customer Information
+              </h2>
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <span className="text-gray-600 font-medium">Name:</span>
-                <span className="text-gray-900">{details.firstname} {details.lastname}</span>
+                <span className="text-gray-900">
+                  {details.firstname} {details.lastname}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-gray-500" />
@@ -279,7 +320,9 @@ export default function WalkInPage() {
               <div className="bg-purple-100 p-2 rounded-lg">
                 <Car className="w-5 h-5 text-purple-600" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Vehicle Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Vehicle Information
+              </h2>
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -288,11 +331,15 @@ export default function WalkInPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-gray-600 font-medium">Plate Number:</span>
-                <span className="text-gray-900 bg-gray-100 px-2 py-1 rounded font-mono text-sm">{details.plate_number}</span>
+                <span className="text-gray-900 bg-gray-100 px-2 py-1 rounded font-mono text-sm">
+                  {details.plate_number}
+                </span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-gray-600 font-medium">Issue:</span>
-                <span className="text-gray-900">{details.issue_description}</span>
+                <span className="text-gray-900">
+                  {details.issue_description}
+                </span>
               </div>
             </div>
           </div>
@@ -304,11 +351,16 @@ export default function WalkInPage() {
             <div className="bg-rose-100 p-2 rounded-lg">
               <CalendarDays className="w-5 h-5 text-rose-600" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900">Follow-up Schedule</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Follow-up Schedule
+            </h2>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="flex-1">
-              <label htmlFor="followUpDate" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="followUpDate"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Select Follow-up Date
               </label>
               <input
@@ -322,7 +374,9 @@ export default function WalkInPage() {
             {details.follow_up_date && (
               <div className="flex-1 bg-rose-50 p-3 rounded-lg border border-rose-200">
                 <p className="text-sm text-gray-600 mb-1">Scheduled for:</p>
-                <p className="text-rose-700 font-medium">{formatFollowUpDate(details.follow_up_date)}</p>
+                <p className="text-rose-700 font-medium">
+                  {formatFollowUpDate(details.follow_up_date)}
+                </p>
               </div>
             )}
           </div>
@@ -335,7 +389,9 @@ export default function WalkInPage() {
               <div className="bg-indigo-100 p-2 rounded-lg">
                 <FileText className="w-5 h-5 text-indigo-600" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Follow-up Notes</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Follow-up Notes
+              </h2>
             </div>
             <button
               onClick={() => setShowAddNoteModal(true)}
@@ -345,17 +401,22 @@ export default function WalkInPage() {
               Add Note
             </button>
           </div>
-          
+
           {details.follow_up_notes.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
               <p>No follow-up notes yet</p>
-              <p className="text-sm">Click "Add Note" to create your first follow-up note</p>
+              <p className="text-sm">
+                Click "Add Note" to create your first follow-up note
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
               {details.follow_up_notes.map((note) => (
-                <div key={note.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div
+                  key={note.id}
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -395,7 +456,9 @@ export default function WalkInPage() {
         {/* Car Images */}
         {details.car_images.length > 0 && (
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Car Images</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Car Images
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {details.car_images.map((img, index) => (
                 <div key={index} className="relative group">
@@ -417,24 +480,34 @@ export default function WalkInPage() {
             <div className="bg-orange-100 p-2 rounded-lg">
               <Wrench className="w-5 h-5 text-orange-600" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900">Service Details</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Service Details
+            </h2>
           </div>
           <div className="bg-gray-50 rounded-lg p-4 space-y-3">
             <div className="flex items-center gap-2">
               <span className="text-gray-600 font-medium">Service Type:</span>
-              <span className="text-gray-900">{details.service.service_type}</span>
+              <span className="text-gray-900">
+                {details.service.service_type}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-gray-600 font-medium">Service Name:</span>
-              <span className="text-gray-900">{details.service.service_name}</span>
+              <span className="text-gray-900">
+                {details.service.service_name}
+              </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-gray-600 font-medium">Description:</span>
-              <span className="text-gray-900">{details.service.description}</span>
+              <span className="text-gray-900">
+                {details.service.description}
+              </span>
             </div>
             <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
               <span className="text-gray-600 font-medium">Fee:</span>
-              <span className="text-xl font-bold text-green-600">${details.service.service_fee.toFixed(2)}</span>
+              <span className="text-xl font-bold text-green-600">
+                ${details.service.service_fee.toFixed(2)}
+              </span>
             </div>
           </div>
         </div>
@@ -446,25 +519,46 @@ export default function WalkInPage() {
               <div className="bg-teal-100 p-2 rounded-lg">
                 <Package className="w-5 h-5 text-teal-600" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Inventory Items</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Inventory Items
+              </h2>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 rounded-tl-lg">Category</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Item Name</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Quantity</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 rounded-tr-lg">Price</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 rounded-tl-lg">
+                      Category
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                      Item Name
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                      Quantity
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 rounded-tr-lg">
+                      Price
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {details.inventory.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-4 py-3 text-sm text-gray-900">{item.category}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{item.item_name}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{item.quantity}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">${item.total_price.toFixed(2)}</td>
+                    <tr
+                      key={index}
+                      className="hover:bg-gray-50 transition-colors duration-150"
+                    >
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {item.category}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {item.item_name}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {item.quantity}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        ${item.total_price.toFixed(2)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -477,7 +571,10 @@ export default function WalkInPage() {
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="text-2xl font-bold text-gray-900">
-              Total: <span className="text-green-600">${details.total.toFixed(2)}</span>
+              Total:{" "}
+              <span className="text-green-600">
+                ${details.total.toFixed(2)}
+              </span>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <select
@@ -511,10 +608,10 @@ export default function WalkInPage() {
                   <FileText className="w-5 h-5 text-indigo-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  {editingNote ? 'Edit Follow-up Note' : 'Add Follow-up Note'}
+                  {editingNote ? "Edit Follow-up Note" : "Add Follow-up Note"}
                 </h3>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -527,7 +624,7 @@ export default function WalkInPage() {
                     className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Note
@@ -540,7 +637,7 @@ export default function WalkInPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => {
@@ -558,7 +655,7 @@ export default function WalkInPage() {
                   disabled={!newNote.trim() || !newNoteDate}
                   className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg transition-colors duration-200"
                 >
-                  {editingNote ? 'Update Note' : 'Add Note'}
+                  {editingNote ? "Update Note" : "Add Note"}
                 </button>
               </div>
             </div>
@@ -577,17 +674,18 @@ export default function WalkInPage() {
                   Send SMS to {details.contact}
                 </h3>
               </div>
-              
+
               {/* Show follow-up date in SMS modal if set */}
               {details.follow_up_date && (
                 <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <p className="text-sm text-blue-700">
                     <CalendarDays className="w-4 h-4 inline mr-1" />
-                    Follow-up scheduled: {formatFollowUpDate(details.follow_up_date)}
+                    Follow-up scheduled:{" "}
+                    {formatFollowUpDate(details.follow_up_date)}
                   </p>
                 </div>
               )}
-              
+
               <textarea
                 value={smsMessage}
                 onChange={(e) => setSmsMessage(e.target.value)}
@@ -612,7 +710,12 @@ export default function WalkInPage() {
           </div>
         )}
 
-        {showInvoice && <Invoice customerDetails={customerDetails} onClose={() => setShowInvoice(false)} />}
+        {showInvoice && (
+          <Invoice
+            customerDetails={customerDetails}
+            onClose={() => setShowInvoice(false)}
+          />
+        )}
       </div>
     </div>
   );

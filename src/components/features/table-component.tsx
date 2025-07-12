@@ -63,7 +63,7 @@ export default function TableComponent<T>({
   });
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-4">
       <div className={`${className} border rounded-md overflow-x-auto`}>
         <Table>
           <TableHeader>

@@ -29,6 +29,7 @@ CREATE TABLE
                 'Completed'
             )
         ) NOT NULL,
-        `follow_up` DATE NOT NULL,
+        `follow_up_for` TEXT NOT NULL,
+        `follow_up_date` DATE NOT NULL,
         `created_at` TIMESTAMP DEFAULT now ()
     )

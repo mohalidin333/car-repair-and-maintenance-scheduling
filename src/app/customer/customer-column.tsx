@@ -1,26 +1,29 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Eye, Printer } from "lucide-react";
+import { Ban, Eye, HandCoins, Pen, Printer } from "lucide-react";
 
 interface CustomersColumnsProps {
-  handleProcess: (rowId: number) => void;
-  handleInvoice: (rowId: number) => void;
+  handleEdit: (row: any) => void;
+  handleCancel: (row: any) => void;
+  handleView: (row: any) => void;
+  handleInvoice: (row: any) => void;
 }
 
 export type CustomerType = {
   id: number;
-  firstname: string;
-  lastname: string;
-  contact: string;
   schedule: string;
   service_type: string;
   service_name: string;
+  total_fee: number;
   status: string;
+  created_at: string;
 };
 
 export const CustomersColumns = ({
-  handleProcess,
+  handleEdit,
+  handleCancel,
+  handleView,
   handleInvoice,
 }: CustomersColumnsProps): ColumnDef<CustomerType>[] => [
   {
@@ -32,20 +35,6 @@ export const CustomersColumns = ({
     accessorKey: "schedule",
     header: "Schedule",
     cell: ({ row }) => <div>{row.getValue("schedule")}</div>,
-  },
-  {
-    accessorFn: (row) => `${row.firstname} ${row.lastname}`,
-    id: "fullname",
-    header: "Full Name",
-    cell: ({ row }) => {
-      const { contact } = row.original;
-      return (
-        <div className="space-y-2">
-          <div className="font-semibold">{row.getValue("fullname")}</div>
-          <div className="text-muted-foreground">{contact}</div>
-        </div>
-      );
-    },
   },
 
   {
@@ -69,6 +58,13 @@ export const CustomersColumns = ({
     accessorKey: "service_name",
     header: "Service Name",
     cell: ({ row }) => <div>{row.getValue("service_name")}</div>,
+  },
+  {
+    accessorKey: "total_fee",
+    header: "Total Fee",
+    cell: ({ row }) => (
+      <div>₱{Number(row.getValue("total_fee")).toLocaleString()}.00</div>
+    ),
   },
   {
     accessorKey: "status",
@@ -106,35 +102,44 @@ export const CustomersColumns = ({
     accessorKey: "actions",
     header: () => <div className="w-full text-right">Actions</div>,
 
-    cell: ({ row }) => (
-      <div className="justify-end flex items-center gap-2">
-        <button
-          onClick={() => handleProcess(row.original.id)}
-          className="border hover:bg-blue-300 border-blue-300 text-blue-800 px-2 py-1 rounded-md cursor-pointer"
-        >
-          <Eye size={15} />
-        </button>
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
 
-        <button
-          onClick={() => handleInvoice(row.original.id)}
-          className="border hover:bg-green-300 border-green-300 text-green-800 px-2 py-1 rounded-md cursor-pointer"
-        >
-          <Printer size={15} />
-        </button>
-      </div>
-    ),
-  },
-  {
-    id: "search",
-    accessorFn: () => "",
-    cell: () => null,
-    header: () => null,
-    enableColumnFilter: true,
-    filterFn: (row, _id, value) => {
-      const fullName =
-        `${row.original.firstname} ${row.original.lastname}`.toLowerCase();
-      return fullName.includes(value.toLowerCase());
+      if (status === "Pending") {
+        return (
+          <div className="justify-end flex items-center gap-2">
+            <button
+              onClick={() => handleEdit(row.original.id)}
+              className="border hover:bg-blue-300 border-blue-300 text-blue-800 px-2 py-1 rounded-md cursor-pointer"
+            >
+              <Pen size={15} />
+            </button>
+            <button
+              onClick={() => handleCancel(row.original.id)}
+              className="border hover:bg-red-300 border-red-300 text-red-800 px-2 py-1 rounded-md cursor-pointer"
+            >
+              <Ban size={15} />
+            </button>
+          </div>
+        );
+      } else if (status !== "Disapproved" && status !== "Cancelled") {
+        return (
+          <div className="justify-end flex items-center gap-2">
+            <button
+              onClick={() => handleView(row.original.id)}
+              className="border hover:bg-blue-300 border-blue-300 text-blue-800 px-2 py-1 rounded-md cursor-pointer"
+            >
+              <p className="text-xs">Pay Gcash</p>
+            </button>
+            <button
+              onClick={() => handleInvoice(row.original.id)}
+              className="border hover:bg-green-300 border-green-300 text-green-800 px-2 py-1 rounded-md cursor-pointer"
+            >
+              <Printer size={15} />
+            </button>
+          </div>
+        );
+      }
     },
-    meta: { hidden: true },
   },
 ];

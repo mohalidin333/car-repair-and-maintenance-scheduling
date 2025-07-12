@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import ProfileComponent from "@/components/features/profile-component";
-import { Bell } from "lucide-react";
-import NotificationComponent from "@/components/features/notification-component";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
+  // const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
 
   return (
     <SidebarProvider>
@@ -23,7 +21,7 @@ export default function AdminLayout({
             <SidebarTrigger className="border" />
 
             <div className="flex items-center gap-4">
-              <div
+              {/* <div
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 className="relative cursor-pointer p-1 flex"
               >
@@ -34,13 +32,13 @@ export default function AdminLayout({
                   9+
                 </p>
 
-                {isNotificationOpen && <NotificationComponent />}
-              </div>
-              <ProfileComponent />
+                {isNotificationOpen && <NotificationComponent  />}
+              </div> */}
+              <ProfileComponent link="/admin/profile" />
             </div>
           </div>
         </header>
-        <main className="overflow-y-auto">{children}</main>
+        <main className="overflow-auto">{children}</main>
       </div>
     </SidebarProvider>
   );

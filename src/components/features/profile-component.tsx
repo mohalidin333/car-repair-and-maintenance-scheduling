@@ -13,7 +13,7 @@ import { LogOut, User2 } from "lucide-react";
 import Link from "next/link";
 import { logout } from "@/app/(auth)/action";
 
-export default function ProfileComponent() {
+export default function ProfileComponent({link} : {link: string}) {
 
   const handleLogout = async () => {
     await logout();
@@ -30,7 +30,7 @@ export default function ProfileComponent() {
       <DropdownMenuContent align="end" className="min-w-[10rem]">
         <DropdownMenuLabel>Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link href={"/profile"}>
+        <Link href={link}>
           <DropdownMenuItem className="cursor-pointer">
             <User2 color="black" /> Profile
           </DropdownMenuItem>

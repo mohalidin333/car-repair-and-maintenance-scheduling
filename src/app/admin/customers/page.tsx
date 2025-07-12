@@ -118,7 +118,7 @@ function Customers() {
   };
 
   return (
-    <div className="p-4 flex flex-col gap-4">
+    <div className=" p-4 flex flex-col gap-4">
       {/* header */}
       <header className="flex-wrap flex items-center justify-between gap-4">
         {/* title */}
