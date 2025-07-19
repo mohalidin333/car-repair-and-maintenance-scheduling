@@ -1,0 +1,66 @@
+  // add
+  
+  const [isLoading, setIsLoading] = useState(false);
+
+  setIsLoading(true);
+    try {
+      await createClient().from("services").insert(values);
+      toast.success("Service added successfully");
+    } catch (error) {
+      toast.error((error as Error).message);
+    } finally {
+      setIsLoading(false);
+      isOpenModal(false);
+    }
+
+     {!isLoading ? (
+                <Button type="submit">Save</Button>
+              ) : (
+                <Button type="submit"><RotateCw className="animate-spin" size={15} />Saving..</Button>
+              )}
+
+    // select
+    
+     useEffect(() => {
+    const getData = async () => {
+      try {
+        const { data: services } = await createClient()
+          .from("services")
+          .select("*");
+
+        setServices(services as ServiceType[]);
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    };
+    getData();
+  }, []);
+
+  // delete
+
+   const handleDeleteUser = async () => {
+    if (service) {
+      try {
+        await createClient().from("services").delete().eq("id", service.id);
+        toast.success("Service deleted successfully");
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    }
+  };
+
+  // edit
+
+   setIsLoading(true);
+    try {
+      await createClient()
+        .from("services")
+        .update(values)
+        .eq("id", service?.id);
+      toast.success("Service updated successfully");
+    } catch (error) {
+      toast.error((error as Error).message);
+    } finally {
+      setIsLoading(false);
+      router.push("/admin/services");
+    }

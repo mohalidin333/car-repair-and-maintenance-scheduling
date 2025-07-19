@@ -1,0 +1,258 @@
+"use client";
+
+import React, { useState } from "react";
+import Invoice from "../invoice";
+
+const customerDetails = {
+  invoice_id: "1234",
+  firstname: "John",
+  lastname: "Doe",
+  contact: "1234567890",
+  address: "123 Main St",
+  car_name: "Honda Civic",
+  plate_number: "ABC123",
+  issue_description: "Engine problem",
+  car_images: [
+    "https://example.com/image1.jpg",
+    "https://example.com/image2.jpg",
+  ],
+  schedule: "Tuesday May 7, 10:00 AM",
+  service: {
+    service_type: "Repair",
+    service_name: "Air Conditioning Repair",
+    service_fee: 3500.0,
+    description:
+      "Diagnose and repair issues with the vehicle's air conditioning system.",
+  },
+  inventory: [
+    {
+      category: "Product",
+      item_name: "Premium Office Chair",
+      quantity: 1,
+      total_price: 129.99,
+    },
+  ],
+  total: 3500.0,
+  status: "Pending",
+  created_at: "2023-05-07T10:00:00Z",
+};
+
+const statusOptions = [
+  "Pending",
+  "Approved",
+  "Disapproved",
+  "Cancelled",
+  "In-Progress",
+  "Completed",
+];
+
+export default function WalkInPage() {
+  const [details, setDetails] = useState(customerDetails);
+  const [smsMessage, setSmsMessage] = useState("");
+  const [showSmsModal, setShowSmsModal] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
+
+  const handlePrintInvoice = () => {
+    setShowInvoice(true);
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDetails({ ...details, status: e.target.value });
+  };
+
+  const handleSendSms = () => {
+    alert(`SMS sent to ${details.contact}:\n\n${smsMessage}`);
+    setShowSmsModal(false);
+    setSmsMessage("");
+  };
+
+  return (
+    <div className="bg-white my-8 rounded-lg border space-y-8 px-4 py-8 max-w-screen-lg mx-auto">
+      {/* Header with invoice ID and print button */}
+      <div className="flex justify-between items-center border-b pb-4">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Appointment # {details.invoice_id}
+        </h1>
+        <button
+          onClick={handlePrintInvoice}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Print Invoice
+        </button>
+      </div>
+
+      {/* Customer Information */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
+          <div className="space-y-2">
+            <p>
+              <span className="font-medium">Name:</span> {details.firstname}{" "}
+              {details.lastname}
+            </p>
+            <p>
+              <span className="font-medium">Contact:</span> {details.contact}
+            </p>
+            <p>
+              <span className="font-medium">Address:</span> {details.address}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Vehicle Information</h2>
+          <div className="space-y-2">
+            <p>
+              <span className="font-medium">Car Model:</span> {details.car_name}
+            </p>
+            <p>
+              <span className="font-medium">Plate Number:</span>{" "}
+              {details.plate_number}
+            </p>
+            <p>
+              <span className="font-medium">Issue:</span>{" "}
+              {details.issue_description}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Car Images */}
+      {details.car_images.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Car Images</h2>
+          <div className="flex flex-wrap gap-4">
+            {details.car_images.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Car ${index + 1}`}
+                className="w-48 h-32 object-cover rounded border"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Service Details */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Service Details</h2>
+        <div className="border rounded-lg p-4">
+          <p>
+            <span className="font-medium">Service Type:</span>{" "}
+            {details.service.service_type}
+          </p>
+          <p>
+            <span className="font-medium">Service Name:</span>{" "}
+            {details.service.service_name}
+          </p>
+          <p>
+            <span className="font-medium">Description:</span>{" "}
+            {details.service.description}
+          </p>
+          <p>
+            <span className="font-medium">Fee:</span> $
+            {details.service.service_fee.toFixed(2)}
+          </p>
+        </div>
+      </div>
+
+      {/* Inventory Items */}
+      {details.inventory.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Inventory Items</h2>
+          <div className="border rounded-lg overflow-hidden">
+            <table className="min-w-full">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left">Category</th>
+                  <th className="px-4 py-2 text-left">Item Name</th>
+                  <th className="px-4 py-2 text-left">Quantity</th>
+                  <th className="px-4 py-2 text-left">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {details.inventory.map((item, index) => (
+                  <tr
+                    key={index}
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  >
+                    <td className="px-4 py-2">{item.category}</td>
+                    <td className="px-4 py-2">{item.item_name}</td>
+                    <td className="px-4 py-2">{item.quantity}</td>
+                    <td className="px-4 py-2">
+                      ${item.total_price.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Total and Status */}
+      <div className="flex justify-between items-center border-t pt-4">
+        <div className="text-xl font-bold">
+          Total: ${details.total.toFixed(2)}
+        </div>
+        <div className="flex items-center gap-4">
+          <select
+            value={details.status}
+            onChange={handleStatusChange}
+            className="border rounded px-3 py-2"
+          >
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setShowSmsModal(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          >
+            Send SMS
+          </button>
+        </div>
+      </div>
+
+      {/* Invoice Component */}
+
+      {showInvoice && (
+        <Invoice customerDetails={details} />
+      )}
+
+      {/* SMS Modal */}
+      {showSmsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4">
+              Send SMS to {details.contact}
+            </h3>
+            <textarea
+              value={smsMessage}
+              onChange={(e) => setSmsMessage(e.target.value)}
+              className="w-full border rounded p-2 mb-4 h-32"
+              placeholder="Type your message here..."
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowSmsModal(false)}
+                className="px-4 py-2 border rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendSms}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
