@@ -1,6 +1,42 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AboutSection() {
+  const [completedAppointments, setCompletedAppointments] = useState<number>(0);
+  const [totalAppointments, setTotalAppointments] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchAppointmentData = async () => {
+      try {
+        setLoading(true);
+        
+        // Get count of completed appointments
+        const { count: completedCount } = await supabase
+          .from("appointments")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "Completed");
+
+        // Get total count of all appointments
+        const { count: totalCount } = await supabase
+          .from("appointments")
+          .select("*", { count: "exact", head: true });
+
+        setCompletedAppointments(completedCount || 0);
+        setTotalAppointments(totalCount || 0);
+      } catch (error) {
+        console.error("Error fetching appointment data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointmentData();
+  }, []);
+
   return (
     <section id="about" className="border-y bg-gray-50 py-[5rem] px-8">
       <div className="md:flex-row flex-col flex justify-between gap-[5rem] max-w-5xl mx-auto">
@@ -17,21 +53,25 @@ export default function AboutSection() {
             We make it easy to take care of your vehicle without the usual
             hassle. With our simple and intuitive online platform, you can
             schedule repairs and routine maintenance anytime, anywhere — no
-            phone calls, no waiting in line. Whether it’s an oil change, brake
+            phone calls, no waiting in line. Whether it's an oil change, brake
             check, or a major repair, we connect you with reliable service
-            providers and help you stay on top of your car’s health. Fast,
+            providers and help you stay on top of your car's health. Fast,
             convenient, and dependable — because your time and safety matter.
           </p>
         </div>
 
         <div className="flex flex-col gap-[5rem] text-center">
-          <div className=" flex flex-col gap-2 flex-1 ">
-            <span className="title font-bold">28+</span>
+          <div className="flex flex-col gap-2 flex-1">
+            <span className="title font-bold">
+              {loading ? "..." : `${completedAppointments}+`}
+            </span>
             <label className="font-semibold text-muted-foreground">Clients Served</label>
           </div>
 
-          <div className="border-t pt-[5rem] flex flex-col gap-2 flex-1 ">
-            <span className="title font-bold">30+</span>
+          <div className="border-t pt-[5rem] flex flex-col gap-2 flex-1">
+            <span className="title font-bold">
+              {loading ? "..." : `${totalAppointments}+`}
+            </span>
             <label className="font-semibold text-muted-foreground">
               Total Appointments
             </label>

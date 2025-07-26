@@ -1,5 +1,5 @@
 export type ResetFieldsType = {
     label: string;
-    name: "password";
+    name: "password" | "confirmPassword";
     type: string;
   };

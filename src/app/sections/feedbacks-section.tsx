@@ -1,27 +1,52 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+interface Feedback {
+  name: string;
+  comment: string;
+  ratings: number;
+  created_at?: string;
+}
 
 export default function FeedbacksSection() {
-  const feedbacks = [
-    {
-      name: "Mark Dela Cruz",
-      comment:
-        "Super convenient! I was able to book a repair in just a few clicks. The service center was professional and quick!",
-      rating: 5,
-    },
-    {
-      name: "Ana Reyes",
-      comment:
-        "Great platform for car maintenance. I love how easy it is to schedule appointments without calling anyone.",
-      rating: 4,
-    },
-    {
-      name: "Jomar Santos",
-      comment:
-        "It saved me a lot of time! Highly recommend this to anyone tired of waiting in line at the shop.",
-      rating: 5,
-    },
-  ];
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("feedbacks")
+          .select("name, ratings, comment, created_at")
+          .order("created_at", { ascending: false }) // Show newest first
+          .limit(3); // Limit to 3 most recent feedbacks
+
+        if (error) throw error;
+        setFeedbacks(data || []);
+      } catch (error) {
+        console.error("Error fetching feedbacks:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeedbacks();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="feedback" className="bg-white py-[5rem] px-8">
+        <div className="max-w-5xl mx-auto text-center">
+          <p>Loading feedbacks...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -39,26 +64,32 @@ export default function FeedbacksSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        {feedbacks.map((fb, index) => (
-          <div
-            key={index}
-            className="gap-4 flex flex-col p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition duration-300 ease-in-out bg-white"
-          >
-            <div className="flex items-center gap-1 text-yellow-500">
-              {[...Array(fb.rating)].map((_, i) => (
-                <Star key={i} size={16} fill="currentColor" />
-              ))}
+      {feedbacks.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {feedbacks.map((fb, index) => (
+            <div
+              key={index}
+              className="gap-4 flex flex-col p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition duration-300 ease-in-out bg-white"
+            >
+              <div className="flex items-center gap-1 text-yellow-500">
+                {[...Array(fb.ratings)].map((_, i) => (
+                  <Star key={i} size={16} fill="currentColor" />
+                ))}
+              </div>
+              <p className="text-gray-700 text-sm italic">
+                &quot;{fb.comment}&quot;
+              </p>
+              <span className="text-sm font-semibold text-gray-800 mt-auto">
+                — {fb.name}
+              </span>
             </div>
-            <p className="text-gray-700 text-sm italic">
-              &quot;{fb.comment}&quot;
-            </p>
-            <span className="text-sm font-semibold text-gray-800 mt-auto">
-              — {fb.name}
-            </span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="max-w-5xl mx-auto text-center text-gray-500">
+          No feedbacks available yet
+        </div>
+      )}
     </section>
   );
 }

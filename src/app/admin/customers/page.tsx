@@ -6,7 +6,6 @@ import { Plus } from "lucide-react";
 import TableComponent from "@/components/features/table-component";
 import SearchComponent from "@/components/features/search-component";
 import FilterComponent from "@/components/features/filter-component";
-import { CustomersData } from "./customers-data";
 import { CustomersColumns } from "./customers-column";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { useFilters } from "@/hooks/use-filters";
@@ -49,40 +48,6 @@ export type CustomerDetailsType = {
   total: number;
   status: Status;
   created_at: string;
-};
-
-const customerDetails = {
-  invoice_id: "1234",
-  firstname: "John",
-  lastname: "Doe",
-  contact: "1234567890",
-  address: "123 Main St",
-  car_name: "Honda Civic",
-  plate_number: "ABC123",
-  issue_description: "Engine problem",
-  car_images: [
-    "https://example.com/image1.jpg",
-    "https://example.com/image2.jpg",
-  ],
-  schedule: "Tuesday May 7, 10:00 AM",
-  service: {
-    service_type: "Repair",
-    service_name: "Air Conditioning Repair",
-    service_fee: 3500.0,
-    description:
-      "Diagnose and repair issues with the vehicle's air conditioning system.",
-  },
-  inventory: [
-    {
-      category: "Product",
-      item_name: "Premium Office Chair",
-      quantity: 1,
-      total_price: 129.99,
-    },
-  ],
-  total: 3500.0,
-  status: "Pending" as Status,
-  created_at: "2023-05-07T10:00:00Z",
 };
 
 const filterByServiceType = [

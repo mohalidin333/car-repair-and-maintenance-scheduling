@@ -1,8 +1,16 @@
 "use client";
 
-import React, { useRef, useCallback } from "react";
-import { TotalSalesData } from "./total-sales-data";
+import React, { useRef, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
+
+interface TotalSalesData {
+  id: number;
+  service: number;
+  inventory: number;
+  total: number;
+  created_at: string;
+}
 
 interface TotalSalesReportModalProps {
   isOpen: boolean;
@@ -11,15 +19,43 @@ interface TotalSalesReportModalProps {
 
 export default function TotalSalesReportModal({ isOpen, onClose }: TotalSalesReportModalProps) {
   const printRef = useRef<HTMLDivElement>(null);
+  const [totalSalesData, setTotalSalesData] = useState<TotalSalesData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('total_sales')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setTotalSalesData(data || []);
+      } catch (error) {
+        console.error('Error fetching sales data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchSalesData();
+    }
+  }, [isOpen]);
 
   const handlePrint = useCallback(() => {
+    if (!totalSalesData.length) return;
+
     const win = window.open("", "_blank");
     if (!win) return;
 
-    const totalService = TotalSalesData.reduce((sum, item) => sum + item.service, 0);
-    const totalInventory = TotalSalesData.reduce((sum, item) => sum + item.inventory, 0);
-    const totalRevenue = TotalSalesData.reduce((sum, item) => sum + item.total, 0);
-    const totalEntries = TotalSalesData.length;
+    const totalService = totalSalesData.reduce((sum, item) => sum + item.service, 0);
+    const totalInventory = totalSalesData.reduce((sum, item) => sum + item.inventory, 0);
+    const totalRevenue = totalSalesData.reduce((sum, item) => sum + item.total, 0);
+    const totalEntries = totalSalesData.length;
     const averageTransaction = totalRevenue / totalEntries;
     const servicePercentage = (totalService / totalRevenue) * 100;
     const inventoryPercentage = (totalInventory / totalRevenue) * 100;
@@ -51,7 +87,7 @@ export default function TotalSalesReportModal({ isOpen, onClose }: TotalSalesRep
       }
     `;
 
-    const tableRows = TotalSalesData.map((item, _) => {
+    const tableRows = totalSalesData.map((item) => {
       const servicePercent = (item.service / item.total) * 100;
       const inventoryPercent = (item.inventory / item.total) * 100;
       return `
@@ -126,17 +162,40 @@ export default function TotalSalesReportModal({ isOpen, onClose }: TotalSalesRep
     win.focus();
     win.print();
     win.close();
-  }, []);
+  }, [totalSalesData]);
 
-  const totalService = TotalSalesData.reduce((sum, item) => sum + item.service, 0);
-  const totalInventory = TotalSalesData.reduce((sum, item) => sum + item.inventory, 0);
-  const totalRevenue = TotalSalesData.reduce((sum, item) => sum + item.total, 0);
-  const totalEntries = TotalSalesData.length;
+  if (!isOpen) return null;
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md text-center">
+          <p>Loading sales data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!totalSalesData.length) {
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md text-center">
+          <p>No sales data available</p>
+          <Button onClick={onClose} className="mt-4">
+            Close
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalService = totalSalesData.reduce((sum, item) => sum + item.service, 0);
+  const totalInventory = totalSalesData.reduce((sum, item) => sum + item.inventory, 0);
+  const totalRevenue = totalSalesData.reduce((sum, item) => sum + item.total, 0);
+  const totalEntries = totalSalesData.length;
   const averageTransaction = totalRevenue / totalEntries;
   const servicePercentage = (totalService / totalRevenue) * 100;
   const inventoryPercentage = (totalInventory / totalRevenue) * 100;
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -205,7 +264,7 @@ export default function TotalSalesReportModal({ isOpen, onClose }: TotalSalesRep
                   </tr>
                 </thead>
                 <tbody>
-                  {TotalSalesData.map((item, index) => {
+                  {totalSalesData.map((item, index) => {
                     const servicePercent = (item.service / item.total) * 100;
                     const inventoryPercent = (item.inventory / item.total) * 100;
 

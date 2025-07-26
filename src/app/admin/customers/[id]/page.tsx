@@ -12,6 +12,10 @@ import {
   MapPin,
   Phone,
   CalendarDays,
+  PhilippinePeso,
+  Save,
+  RotateCw,
+  AlertTriangle,
 } from "lucide-react";
 import Invoice from "../invoice";
 import { useParams } from "next/navigation";
@@ -23,7 +27,7 @@ import { InventoryType } from "@/app/customer/inventory-type";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { set } from "date-fns";
+import axios from "axios";
 
 export type Status =
   | "Pending"
@@ -110,8 +114,13 @@ export default function WalkInPage() {
     inventory: 0,
     total: 0,
   });
-  const [status, setStatus] = useState<string>("");
+  const [followUpNotes, setFollowUpNotes] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [status, setStatus] = useState("");
+  const [reference, setReference] = useState("");
+  const [smsCredit, setSMSCredits] = useState(0);
 
+  // handle status
   const handleChangeStatus = async (e: ChangeEvent<HTMLSelectElement>) => {
     const status = e.target.value;
 
@@ -153,15 +162,55 @@ export default function WalkInPage() {
     }
   };
 
+  // handle print
   const handlePrintInvoice = () => {
     setShowInvoice(true);
   };
-  const handleSendSms = () => {
-    alert(`SMS sent to ${details?.contact}:\n\n${smsMessage}`);
-    setShowSmsModal(false);
-    setSmsMessage("");
+
+  // handle send sms
+  const handleSendSms = async () => {
+    try {
+      // Show loading toast
+      const loadingToast = toast.loading("Sending SMS...");
+
+      const contact = details?.contact?.replace(/^0/, "+63") || "";
+
+      const response = await axios.post(
+        "/api/sms/",
+        {
+          sms: smsMessage,
+          contactNo: contact,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Success notification
+      if ((response.data as { status: string }).status === "success") {
+        // update sms credit
+        await supabase
+          .from("sms_credit")
+          .update({ credit: smsCredit - 1 })
+          .eq("id", 1);
+
+        toast.success("SMS sent successfully!", {
+          id: loadingToast,
+        });
+        setShowSmsModal(false);
+      }
+
+      console.log("SMS response:", response.data);
+    } catch (error) {
+      toast.error(
+        (error as { response: { data: { error: string } } }).response.data.error
+      );
+    }
   };
 
+  // format follow up date
   const formatFollowUpDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -173,6 +222,52 @@ export default function WalkInPage() {
     });
   };
 
+  // handle follow up date
+  const handleFollowUpDateChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    try {
+      const formattedDate = e.target.value;
+
+      await supabase
+        .from("appointments")
+        .update({ follow_up_date: formattedDate })
+        .eq("id", param.id);
+      toast.success("Follow-up date updated successfully");
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+
+  // handle save follow up notes
+  const handleSaveFollowUpNotes = async () => {
+    try {
+      setIsSaving(true);
+      await supabase
+        .from("appointments")
+        .update({ follow_up_for: followUpNotes })
+        .eq("id", param.id);
+      toast.success("Follow-up notes updated successfully");
+    } catch (error) {
+      toast.error((error as Error).message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // handle is paid
+  const handleIsPaidChange = async (e: ChangeEvent<HTMLSelectElement>) => {
+    try {
+      const isPaid = e.target.value;
+      await supabase
+        .from("appointments")
+        .update({ is_paid: isPaid })
+        .eq("id", param.id);
+      toast.success("Payment status updated successfully");
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+
+  // get appointment
   useEffect(() => {
     const getAppointment = async () => {
       const { error, data: appointmentDetails } = await supabase
@@ -205,10 +300,45 @@ export default function WalkInPage() {
             0
           ),
       });
-      setStatus((appointmentDetails as AppointmentType).status);
+
+      setFollowUpNotes(appointmentDetails?.follow_up_for || "");
+      setStatus(appointmentDetails?.status || "");
     };
     getAppointment();
   }, [param.id]);
+
+  // get payment
+  useEffect(() => {
+    const getPayment = async () => {
+      const { error, data: paymentDetails } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("appointment_id", param.id)
+        .single();
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      setReference(paymentDetails.reference);
+    };
+    getPayment();
+  }, [param.id]);
+
+  // get sms credit
+  useEffect(() => {
+    const getSMSCredit = async () => {
+      const { error, data: smsCredit } = await supabase
+        .from("sms_credit")
+        .select("*")
+        .single();
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      setSMSCredits(smsCredit?.credit);
+    };
+    getSMSCredit();
+  }, []);
 
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-8 px-4">
@@ -449,44 +579,128 @@ export default function WalkInPage() {
           </div>
         </div>
 
-        {/* Follow-up Date Card */}
-        <div className="bg-white rounded-xl  border border-gray-200 p-6 mt-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-rose-100 p-2 rounded-lg">
-              <CalendarDays className="w-5 h-5 text-rose-600" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              Follow-up Schedule
-            </h2>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="flex-1 space-y-2">
-              <label
-                htmlFor="followUpDate"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Select Follow-up Date
-              </label>
-              <Input
-                type="date"
-                id="followUpDate"
-                value={details?.follow_up_date || ""}
-                // onChange={handleFollowUpDateChange}
-                defaultValue={details?.follow_up_date || ""}
-                className="block"
-              />
-              <Textarea />
-            </div>
-            {details?.follow_up_date && (
-              <div className="flex-1 bg-rose-50 p-3 rounded-lg border border-rose-200">
-                <p className="text-sm text-gray-600 mb-1">Scheduled for:</p>
-                <p className="text-rose-700 font-medium">
-                  {formatFollowUpDate(details?.follow_up_date)}
-                </p>
+        {status === "Completed" && (
+          <>
+            {/* payment */}
+            {details?.is_paid === "Paid" && (
+              <div className="flex flex-col items-start bg-white mt-4 rounded-xl  border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-green-100 p-2 rounded-lg flex items-center gap-3">
+                    <PhilippinePeso className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Payment
+                  </h2>
+                </div>
+
+                <>
+                  {" "}
+                  {!reference ? (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm font-medium text-green-800">
+                          Payment Confirmed
+                        </span>
+                      </div>
+                      <div className="mt-2">
+                        <span className="text-gray-600 text-sm">
+                          GCash Reference:
+                        </span>
+                        <div className="font-mono text-lg font-semibold text-gray-900 bg-white px-3 py-2 rounded border mt-1">
+                          {reference}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center space-x-2 mb-3">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <span className="text-sm font-medium text-yellow-800">
+                          Payment Confirmation Required
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        <select
+                          value={details.is_paid}
+                          onChange={handleIsPaidChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                          defaultValue=""
+                        >
+                          <option value="Unpaid">Unpaid</option>
+                          <option value="Paid">Paid</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </>
               </div>
             )}
-          </div>
-        </div>
+            {/* Follow-up Date Card */}
+            <div className="bg-white rounded-xl  border border-gray-200 p-6 mt-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-rose-100 p-2 rounded-lg">
+                  <CalendarDays className="w-5 h-5 text-rose-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Follow-up Schedule
+                </h2>
+              </div>
+
+              {details?.follow_up_date && (
+                <div className="mb-4 flex-1 bg-rose-50 p-3 rounded-lg border border-rose-200">
+                  <p className="text-sm text-gray-600 mb-1">Scheduled for:</p>
+                  <p className="text-rose-700 font-medium">
+                    {formatFollowUpDate(details?.follow_up_date)}
+                  </p>
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <div className="flex-1 space-y-2">
+                  <label
+                    htmlFor="followUpDate"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Select Follow-up Date
+                  </label>
+                  <Input
+                    type="date"
+                    id="followUpDate"
+                    value={details?.follow_up_date || ""}
+                    onChange={(e) => handleFollowUpDateChange(e)}
+                    className="block"
+                  />
+
+                  <label
+                    htmlFor="followUpDate"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Follow-up Notes
+                  </label>
+                  <Textarea
+                    value={followUpNotes}
+                    onChange={(e) => setFollowUpNotes(e.target.value)}
+                    placeholder="Enter follow-up notes"
+                  />
+
+                  <div className="mt-4 flex justify-end w-full">
+                    <button
+                      onClick={handleSaveFollowUpNotes}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 cursor-pointer"
+                    >
+                      {isSaving ? (
+                        <RotateCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}{" "}
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* SMS Modal */}
         {showSmsModal && (
@@ -531,6 +745,18 @@ export default function WalkInPage() {
                 >
                   Send
                 </button>
+              </div>
+
+              {/* sms credit */}
+              <div>
+                <div className="flex items-center gap-3 mt-4">
+                  <div className="bg-yellow-100 p-2 rounded-lg">
+                    <AlertTriangle className="w-3 h-3 text-yellow-600" />
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    You have {smsCredit} SMS credits left
+                  </p>
+                </div>
               </div>
             </div>
           </div>
